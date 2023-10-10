@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import ReactPaginate from 'react-paginate';
 
 const TechRoundTask = () => {
 
+// To render the data on page load or when the page is revisited
   useEffect(() => {
     loadBeerDetails(1);
   }, []);
 
-  const params = useParams();
 
   const [beerInfo, updateBeerInfo] = useState([]);
   const [eventType, updateEventType] = useState("");
 
+  // To load all the data from the API 
   const loadBeerDetails = (selectedPage) => {
     const url = "https://api.punkapi.com/v2/beers?page=" + selectedPage + "&per_page=10";
     axios.get(url)
@@ -26,12 +26,13 @@ const TechRoundTask = () => {
       })
   }
 
+  // For Pagination function & simultaneously load the data according the selected checkbox
   const handlePageClick = (event) => {
     var currentPage = event.selected + 1;
-    if(eventType == "updateBeforeBeerInfo"){
+    if(eventType === "updateBeforeBeerInfo"){
       getBeforeBrewed(currentPage)
     }
-    else if(eventType == "updateAfterBeerInfo"){
+    else if(eventType === "updateAfterBeerInfo"){
       getAfterBrewed(currentPage);
     }
     else{
@@ -39,19 +40,20 @@ const TechRoundTask = () => {
     }
   };
 
+// To load the data from the API whose data vary according to before brewed data
+const getBeforeBrewed = (selectedPage) => {
+  updateEventType("updateBeforeBeerInfo");
+  const url = "https://api.punkapi.com/v2/beers?page=" + selectedPage + "&per_page=10&brewed_before=10-2011";
+  axios.get(url)
+  .then((response) => {
+    updateBeerInfo(response.data);
+  })
+  .catch((error) => {
+    console.log(error);
+  })
+}
 
-  const getBeforeBrewed = (selectedPage) => {
-    updateEventType("updateBeforeBeerInfo");
-    const url = "https://api.punkapi.com/v2/beers?page=" + selectedPage + "&per_page=10&brewed_before=10-2011";
-    axios.get(url)
-      .then((response) => {
-        updateBeerInfo(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-  }
-
+// To load the data from the API whose data vary according to after brewed data
   const getAfterBrewed = (selectedPage) => {
     updateEventType("updateAfterBeerInfo");
 
@@ -63,9 +65,9 @@ const TechRoundTask = () => {
       .catch((error) => {
         console.log(error);
       })
-
   }
 
+  // Mapping of API Data
   var details = beerInfo.map((value, index) => {
     return (
       <tr key={index}>
